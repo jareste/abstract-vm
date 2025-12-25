@@ -1,6 +1,5 @@
 #include <cmath>
 #include <type_traits>
-#include <cassert>
 #include <iostream>
 #include "Operand.hpp"
 
@@ -37,7 +36,7 @@ IOperand const * Operand<T>::makeOp(IOperand const & rhs, char op, eOperandType 
                 result = static_cast<R>(lhsVal % rhsVal);
             break;
         default:
-            assert(false && "Unknown operator");
+            throw std::runtime_error("Unknown operator in makeOp");
     }
 #ifdef DEBUG
     std::cout << "Operation: " << lhsVal << " " << op << " " << rhsVal << " = " << result << std::endl;
@@ -59,7 +58,6 @@ IOperand const * Operand<T>::operate(IOperand const & rhs, char op) const
         case Double: return makeOp<double>(rhs, op, Double);
     }
     throw std::runtime_error("Unknown operand type in operation");
-    return nullptr;
 }
 
 /* Actual methods */

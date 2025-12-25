@@ -49,3 +49,31 @@ class OverflowException : public AVMException
         virtual ~OverflowException() throw (){}
 };
 
+class UnderflowException : public AVMException
+{
+    private:
+        std::string _msg;
+    public:
+        UnderflowException(const std::string& msg) : AVMException(), _msg(msg) {}
+        virtual const char* what() const throw()
+        {
+            return _msg.c_str();
+        }
+
+        virtual ~UnderflowException() throw (){}
+};
+
+class InvalidValue : public AVMException
+{
+    private:
+        std::string _msg;
+    public:
+        InvalidValue(const std::string& msg) : AVMException(), _msg(msg) {}
+        virtual const char* what() const throw()
+        {
+            return _msg.c_str();
+        }
+
+        virtual ~InvalidValue() throw (){}
+};
+

@@ -1,10 +1,10 @@
 NAME = abstract_vm
-TEST_NAME = abstract_vm_test_operand
+TEST_NAME = test_abstract_vm
 
 #########
 RM = rm -rf
 CC = g++
-CFLAGS = -Werror -Wextra -Wall -std=c++20 -fsanitize=address -g -O3 #-DDEBUG
+CFLAGS = -Werror -Wextra -Wall -std=c++20 -O3 #-fsanitize=address -g  #-DDEBUG
 # CFLAGS = -Werror -Wextra -Wall -g -fsanitize=address -O3 -I$(OPENSSL_BUILD_DIR)/include -I$(THIRD_PARTY_PATH)/cJSON -Iinc -DUSE_SSL #-DDEBUG
 # CFLAGS = -Werror -Wextra -Wall -g -fsanitize=thread -O3 -I$(OPENSSL_BUILD_DIR)/include -I$(THIRD_PARTY_PATH)/cJSON -Iinc -DUSE_SSL #-DDEBUG
 LDFLAGS = -lm
@@ -12,8 +12,8 @@ RELEASE_CFLAGS = -Werror -Wextra -Wall -O3 -std=c++20
 #########
 
 #########
-FILES = main Operand test_operand
-FILES_TEST = Operand test_operand
+FILES = main Operand OperandFactory
+FILES_TEST = test_operand Operand OperandFactory 
 
 SRC = $(addsuffix .cpp, $(FILES))
 SRC_TEST = $(addsuffix .cpp, $(FILES_TEST))
@@ -63,7 +63,7 @@ $(TEST_NAME): CFLAGS += -DTEST_OPERAND_MAIN
 $(TEST_NAME): $(TEST_OBJ)
 	$(CC) $(CFLAGS) $^ -o $@
 
-toper: $(TEST_NAME)
+test: $(TEST_NAME)
 
 release: CFLAGS = $(RELEASE_CFLAGS)
 release: re

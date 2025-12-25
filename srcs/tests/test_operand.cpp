@@ -4,6 +4,7 @@
 #include <exception>
 
 #include "../operand/Operand.hpp"
+#include "../operand/OperandFactory.hpp"
 
 #if defined(TEST_OPERAND_MAIN)
 static void banner(const std::string& name) {
@@ -180,6 +181,152 @@ int main() {
             delete r;
         }
         std::cout << "Loop done.\n";
+    });
+
+    banner("7) Operand factory creation tests");
+    run_case("Create Int8 operand with value 42", []{
+        const IOperand* op = OperandFactory::createOperand(Int8, "42");
+        print_result(op);
+        delete op;
+    });
+
+    run_case("Create Float operand with value 3.14", []{
+        const IOperand* op = OperandFactory::createOperand(Float, "3.14");
+        print_result(op);
+        delete op;
+    });
+
+    run_case("Create Double operand with value 2.71828", []{
+        const IOperand* op = OperandFactory::createOperand(Double, "2.71828");
+        print_result(op);
+        delete op;
+    });
+
+    run_case("Create Int16 operand with overflow value 40000: expect exception", []{
+        const IOperand* op = OperandFactory::createOperand(Int16, "40000");
+        print_result(op);
+    }, true);
+
+    run_case("Create Int32 operand with underflow value -3000000000: expect exception", []{
+        const IOperand* op = OperandFactory::createOperand(Int32, "-3000000000");
+        print_result(op);
+    }, true);
+
+    run_case("Create Float operand with overflow value 1e40: expect exception", []{
+        const IOperand* op = OperandFactory::createOperand(Float, "1e40");
+        print_result(op);
+    }, true);
+
+    run_case("Create Double operand with underflow value -1e400: expect exception", []{
+        const IOperand* op = OperandFactory::createOperand(Double, "-1e400");
+        print_result(op);
+    }, true);
+
+    run_case("Create operand with invalid type: expect exception", []{
+        const IOperand* op = OperandFactory::createOperand(static_cast<eOperandType>(999), "42");
+        print_result(op);
+        delete op;
+    }, true);
+
+    banner("8) Operantions with factory-created operands");
+    run_case("Factory Int16 + Factory Float => Float", []{
+        const IOperand* a = OperandFactory::createOperand(Int16, "12345");
+        const IOperand* b = OperandFactory::createOperand(Float, "3.14");
+        const IOperand* r = *a + *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
+    });
+
+    run_case("Factory Double / Factory Int8 => Double", []{
+        const IOperand* a = OperandFactory::createOperand(Double, "22.0");
+        const IOperand* b = OperandFactory::createOperand(Int8, "7");
+        const IOperand* r = *a / *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
+    });
+
+    run_case("Factory Int32 % Factory Int16 => Int16", []{
+        const IOperand* a = OperandFactory::createOperand(Int32, "100");
+        const IOperand* b = OperandFactory::createOperand(Int16, "30");
+        const IOperand* r = *a % *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
+    });
+
+    run_case("Factory Float - Factory Double => Double", []{
+        const IOperand* a = OperandFactory::createOperand(Float, "5.5");
+        const IOperand* b = OperandFactory::createOperand(Double, "2.2");
+        const IOperand* r = *a - *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
+    });
+
+    run_case("Factory Int8 * Factory Int8 => Int8", []{
+        const IOperand* a = OperandFactory::createOperand(Int8, "12");
+        const IOperand* b = OperandFactory::createOperand(Int8, "10");
+        const IOperand* r = *a * *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
+    });
+
+    run_case("Factory Int8 * Factory Int8 with overflow: expect exception", []{
+        const IOperand* a = OperandFactory::createOperand(Int8, "20");
+        const IOperand* b = OperandFactory::createOperand(Int8, "10");
+        const IOperand* r = *a * *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
+    });
+
+    run_case("Factory Float / Factory Float div by zero: expect exception", []{
+        const IOperand* a = OperandFactory::createOperand(Float, "3.14");
+        const IOperand* b = OperandFactory::createOperand(Float, "0.0");
+        const IOperand* r = *a / *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
+    }, true);
+
+    run_case("Factory Double % Factory Double mod by zero: expect exception", []{
+        const IOperand* a = OperandFactory::createOperand(Double, "2.71828");
+        const IOperand* b = OperandFactory::createOperand(Double, "0.0");
+        const IOperand* r = *a % *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
+    }, true);
+
+    run_case("Factory Int16 - Factory Int32 underflow: expect exception", []{
+        const IOperand* a = OperandFactory::createOperand(Int16, "-30000");
+        const IOperand* b = OperandFactory::createOperand(Int32, "10000");
+        const IOperand* r = *a - *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
+    });
+
+    run_case("Factory Float + Factory Float overflow: expect exception", []{
+        const IOperand* a = OperandFactory::createOperand(Float, "1e38");
+        const IOperand* b = OperandFactory::createOperand(Float, "1e38");
+        const IOperand* r = *a + *b;
+        print_result(r);
+        delete a;
+        delete b;
+        delete r;
     });
 
     banner("DONE");
