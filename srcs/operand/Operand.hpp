@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <cassert>
 #include "IOperand.hpp"
+#include "../exception/Exception.hpp"
 
 template <typename T>
 class Operand : public IOperand
@@ -14,12 +15,12 @@ class Operand : public IOperand
     private:
         const T _value;
         const eOperandType _type;
-        eOperandType _precision;
-        std::string* _strValue;
+        std::string _strValue;
 
         template<typename R>
         IOperand const * makeOp(IOperand const & rhs, char op, eOperandType type) const;
         IOperand const * operate(IOperand const & rhs, char op) const;
+
 
     public:
         Operand( T value, eOperandType type );

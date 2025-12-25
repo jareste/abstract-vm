@@ -1,6 +1,7 @@
 #include <iostream>
 #include "operand/Operand.hpp"
 
+#if !defined(TEST_OPERAND_MAIN)
 int main()
 {
     std::cout << "Hello, Abstract VM!" << std::endl;
@@ -13,3 +14,4 @@ int main()
     delete result;
     return 0;
 }
+#endif

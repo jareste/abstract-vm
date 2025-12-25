@@ -1,9 +1,10 @@
 NAME = abstract_vm
+TEST_NAME = abstract_vm_test_operand
 
 #########
 RM = rm -rf
 CC = g++
-CFLAGS = -Werror -Wextra -Wall -std=c++20 -fsanitize=address -g -O3 -DDEBUG
+CFLAGS = -Werror -Wextra -Wall -std=c++20 -fsanitize=address -g -O3 #-DDEBUG
 # CFLAGS = -Werror -Wextra -Wall -g -fsanitize=address -O3 -I$(OPENSSL_BUILD_DIR)/include -I$(THIRD_PARTY_PATH)/cJSON -Iinc -DUSE_SSL #-DDEBUG
 # CFLAGS = -Werror -Wextra -Wall -g -fsanitize=thread -O3 -I$(OPENSSL_BUILD_DIR)/include -I$(THIRD_PARTY_PATH)/cJSON -Iinc -DUSE_SSL #-DDEBUG
 LDFLAGS = -lm
@@ -11,21 +12,26 @@ RELEASE_CFLAGS = -Werror -Wextra -Wall -O3 -std=c++20
 #########
 
 #########
-FILES = main Operand
+FILES = main Operand test_operand
+FILES_TEST = Operand test_operand
 
 SRC = $(addsuffix .cpp, $(FILES))
+SRC_TEST = $(addsuffix .cpp, $(FILES_TEST))
 
-vpath %.cpp srcs srcs/operand
+vpath %.cpp srcs srcs/operand srcs/exception srcs/tests
 #########
 
 OBJ_DIR = objs
+OBJ_DIR_TEST = objs/tests
 
 #########
 #########
 
 #########
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
+TEST_OBJ = $(addprefix $(OBJ_DIR_TEST)/, $(SRC_TEST:.cpp=.o))
 DEP = $(addsuffix .d, $(basename $(OBJ)))
+DEP_TEST = $(addsuffix .d, $(basename $(TEST_OBJ)))
 #########
 
 #########
@@ -33,6 +39,9 @@ $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	${CC} -MMD $(CFLAGS) -c $< -o $@
 
+$(OBJ_DIR_TEST)/%.o: %.cpp
+	@mkdir -p $(@D)
+	${CC} -MMD $(CFLAGS) -c $< -o $@
 
 all: .gitignore	
 	$(MAKE) $(NAME)
@@ -50,13 +59,19 @@ $(NAME): $(OBJ)
 	@echo "EVERYTHING DONE  "
 #	@./.add_path.sh
 
+$(TEST_NAME): CFLAGS += -DTEST_OPERAND_MAIN
+$(TEST_NAME): $(TEST_OBJ)
+	$(CC) $(CFLAGS) $^ -o $@
+
+toper: $(TEST_NAME)
+
 release: CFLAGS = $(RELEASE_CFLAGS)
 release: re
 	@echo "RELEASE BUILD DONE  "
 
 clean:
-	$(RM) $(OBJ) $(DEP)
-	$(RM) -r $(OBJ_DIR)
+	$(RM) $(OBJ) $(DEP) $(TEST_OBJ) $(DEP_TEST)
+	$(RM) -r $(OBJ_DIR) $(OBJ_DIR_TEST)
 	@echo "OBJECTS REMOVED   "
 
 fclean: clean
@@ -71,6 +86,7 @@ re: fclean
 		echo ".gitignore not found, creating it..."; \
 		echo ".gitignore" >> .gitignore; \
 		echo "$(NAME)" >> .gitignore; \
+		echo "$(TEST_NAME)" >> .gitignore; \
 		echo "$(OBJ_DIR)/" >> .gitignore; \
 		echo "*.a" >> .gitignore; \
 		echo "*.pem" >> .gitignore; \
@@ -86,3 +102,4 @@ re: fclean
 
 
 -include $(DEP)
+-include $(DEP_TEST)
