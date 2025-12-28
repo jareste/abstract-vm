@@ -12,13 +12,14 @@ RELEASE_CFLAGS = -Werror -Wextra -Wall -O3 -std=c++20
 #########
 
 #########
-FILES = main Operand OperandFactory
-FILES_TEST = test_operand Operand OperandFactory 
+COMMON_FILES = Operand OperandFactory InputReader
+FILES = main ${COMMON_FILES}
+FILES_TEST = test_operand ${COMMON_FILES}
 
 SRC = $(addsuffix .cpp, $(FILES))
 SRC_TEST = $(addsuffix .cpp, $(FILES_TEST))
 
-vpath %.cpp srcs srcs/operand srcs/exception srcs/tests
+vpath %.cpp srcs srcs/operand srcs/exception srcs/tests srcs/parser
 #########
 
 OBJ_DIR = objs
@@ -75,7 +76,7 @@ clean:
 	@echo "OBJECTS REMOVED   "
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(NAME) $(TEST_NAME)
 	@echo "EVERYTHING REMOVED   "
 
 re: fclean
