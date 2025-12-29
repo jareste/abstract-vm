@@ -1,40 +1,55 @@
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include "operand/Operand.hpp"
 #include "parser/InputReader.hpp"
+#include "parser/Lexer.hpp"
 
 #if !defined(TEST_OPERAND_MAIN)
 int main(int argc, char** argv)
 {
-    std::vector<Line> program;
+    bool isStdin;
+    std::string filename;
+    size_t linesRead;
+
     std::cout << "Hello, Abstract VM!" << std::endl;
 
-    if (argc == 1)
-        program = readProgram(std::cin, true);
-    else
+    isStdin = (argc == 1);
+    filename = (isStdin) ? "stdin" : argv[1];
+
+    inputReader iput(filename, isStdin);
+    linesRead = iput.readProgram(1000);
+    
+    std::cout << "Read " << linesRead << " lines from input." << std::endl;
+
+    Line line;
+    line = iput.getLine();
+    std::cout << "Printing lines read:" << std::endl;
+    while ((line.no != 0))
     {
-        std::ifstream file(argv[1]);
-        if (!file.is_open())
-        {
-            std::cerr << "Error: Could not open file " << argv[1] << std::endl;
-            return 1;
-        }
-        program = readProgram(file, false);
-        file.close();
-    }
-
-    std::cout << "Read " << program.size() << " lines." << std::endl;
-    for (const auto& line : program) {
+        std::cout << "Line ";
         std::cout << line.no << ": " << line.text << std::endl;
+        std::vector<Token> tokens = Lexer::tokenize(line);
+
+#ifdef PRINT_TOKENS
+        std::cout << "Tokens:" << std::endl;
+        for (const auto& token : tokens) {
+            std::cout << "  Kind: ";
+            switch (token.kind) {
+                case TokenKind::Ident: std::cout << "Ident"; break;
+                case TokenKind::Number: std::cout << "Number"; break;
+                case TokenKind::LParen: std::cout << "LParen"; break;
+                case TokenKind::RParen: std::cout << "RParen"; break;
+                case TokenKind::End: std::cout << "End"; break;
+            }
+            std::cout << ", Lexeme: '" << token.lexeme << "', Line: " << token.line << ", Col: " << token.col << std::endl;
+        }
+#endif // PRINT_TOKENS
+
+        line = iput.getLine();
     }
+    std::cout << "End of lines." << std::endl;
 
-    Operand<int> op(42, Int32);
-    Operand<double> op2(3.14, Double);
-
-    IOperand const * result = op + op2;
-    std::cout << "Result: " << result->toString() << std::endl;
-
-    delete result;
     return 0;
 }
 #endif

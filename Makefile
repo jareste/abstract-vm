@@ -12,7 +12,7 @@ RELEASE_CFLAGS = -Werror -Wextra -Wall -O3 -std=c++20
 #########
 
 #########
-COMMON_FILES = Operand OperandFactory InputReader
+COMMON_FILES = Operand OperandFactory InputReader Lexer
 FILES = main ${COMMON_FILES}
 FILES_TEST = test_operand ${COMMON_FILES}
 

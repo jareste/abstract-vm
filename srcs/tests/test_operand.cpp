@@ -5,6 +5,7 @@
 
 #include "../operand/Operand.hpp"
 #include "../operand/OperandFactory.hpp"
+#include "../parser/InputReader.hpp"
 
 #if defined(TEST_OPERAND_MAIN)
 static void banner(const std::string& name) {

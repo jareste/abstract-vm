@@ -77,3 +77,20 @@ class InvalidValue : public AVMException
         virtual ~InvalidValue() throw (){}
 };
 
+
+class LexicalError : public AVMException
+{
+    private:
+        std::string _msg;
+    public:
+        LexicalError(int line, int col, const std::string& msg) : AVMException()
+        {
+            _msg = "Lexical error at line " + std::to_string(line) + ", col " + std::to_string(col) + ": " + msg;
+        }
+        virtual const char* what() const throw()
+        {
+            return _msg.c_str();
+        }
+
+        virtual ~LexicalError() throw (){}
+};
