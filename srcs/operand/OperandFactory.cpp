@@ -1,6 +1,7 @@
 #include <cmath>
 #include <type_traits>
 #include <iostream>
+#include <charconv>
 #include "Operand.hpp"
 #include "OperandFactory.hpp"
 
@@ -9,15 +10,26 @@ OperandFactory::OperandFactory(const OperandFactory& other) { (void)other; }
 const OperandFactory& OperandFactory::operator=(const OperandFactory& other) { (void)other; return *this; }
 OperandFactory::~OperandFactory() {}
 
-static long long parseIntStrict(std::string const& s) {
-    size_t idx = 0;
-    long long v = std::stoll(s, &idx);
-    if (idx != s.size())
+static long long parseIntStrict(std::string const& s)
+{
+    if (s.empty())
         throw InvalidValue("Invalid integer literal: " + s);
+
+    long long v = 0;
+    auto first = s.data();
+    auto last = s.data() + s.size();
+    auto res = std::from_chars(first, last, v);
+
+    if (res.ec == std::errc::result_out_of_range)
+        throw InvalidValue("Integer out of range: " + s);
+    if (res.ec != std::errc() || res.ptr != last)
+        throw InvalidValue("Invalid integer literal: " + s);
+
     return v;
 }
 
-static long double parseFloatStrict(std::string const& s) {
+static long double parseFloatStrict(std::string const& s)
+{
     size_t idx = 0;
     long double v = std::stold(s, &idx);
     if (idx != s.size())
@@ -36,8 +48,8 @@ IOperand const* OperandFactory::createOperand(eOperandType type, std::string con
         &OperandFactory::createDouble
     };
     
-    if (type < Int8 || type > Double)
-        throw std::invalid_argument("Invalid operand type");
+    if (type < Int8 || type > Double) /* cannot happen. */
+        throw InvalidOperandType("Invalid operand type.");
 
     return (factory.*_creators[type])(value);
 }
@@ -93,4 +105,3 @@ IOperand const* OperandFactory::createDouble(std::string const& value) const
         throw OverflowException("Double overflow: " + value);
     return new Operand<double>(static_cast<double>(v), Double);
 }
-

@@ -12,14 +12,14 @@ RELEASE_CFLAGS = -Werror -Wextra -Wall -O3 -std=c++20
 #########
 
 #########
-COMMON_FILES = Operand OperandFactory InputReader Lexer
+COMMON_FILES = Operand OperandFactory InputReader Lexer Parser vm
 FILES = main ${COMMON_FILES}
 FILES_TEST = test_operand ${COMMON_FILES}
 
 SRC = $(addsuffix .cpp, $(FILES))
 SRC_TEST = $(addsuffix .cpp, $(FILES_TEST))
 
-vpath %.cpp srcs srcs/operand srcs/exception srcs/tests srcs/parser
+vpath %.cpp srcs srcs/operand srcs/exception srcs/tests srcs/parser srcs/vm
 #########
 
 OBJ_DIR = objs

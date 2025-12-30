@@ -8,7 +8,8 @@ typedef enum eOperandType
     Int16,
     Int32,
     Float,
-    Double
+    Double,
+    None
 } eOperandType;
 
 inline const char* typeName(eOperandType t)
@@ -20,6 +21,7 @@ inline const char* typeName(eOperandType t)
         case Int32: return "Int32";
         case Float: return "Float";
         case Double: return "Double";
+        case None: return "None";
     }
     return "Unknown";
 }

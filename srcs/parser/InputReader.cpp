@@ -1,5 +1,6 @@
-#include "InputReader.hpp"
 #include <iostream>
+#include "InputReader.hpp"
+#include "../exception/Exception.hpp"
 
 inputReader::inputReader(const std::string& filename, bool isStdin)
 {
@@ -13,7 +14,7 @@ inputReader::inputReader(const std::string& filename, bool isStdin)
         this->_fileStream.open(filename);
         if (!this->_fileStream.is_open())
         {
-            throw std::runtime_error("Could not open file: " + filename);
+            throw FailedToOpenFile(filename);
         }
         this->_file = &this->_fileStream;
     }

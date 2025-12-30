@@ -4,6 +4,31 @@
 #include "Operand.hpp"
 
 /* Private helpers */
+
+template <typename T>
+static std::string m_toCanonicalString(T v, eOperandType type)
+{
+    std::ostringstream oss;
+
+    if (type == Int8 || type == Int16 || type == Int32)
+    {
+        oss << static_cast<long long>(v);
+        return oss.str();
+    }
+
+    if (type == Float)
+    {
+        oss << std::setprecision(std::numeric_limits<float>::max_digits10)
+            << static_cast<float>(v);
+        return oss.str();
+    }
+
+    oss << std::setprecision(std::numeric_limits<double>::max_digits10)
+        << static_cast<double>(v);
+
+    return oss.str();
+}
+
 template <typename T>
 template<typename R>
 IOperand const * Operand<T>::makeOp(IOperand const & rhs, char op, eOperandType type) const
@@ -16,7 +41,6 @@ IOperand const * Operand<T>::makeOp(IOperand const & rhs, char op, eOperandType 
         long double rhsLD = std::stold(rhs.toString());
         rhsVal = static_cast<R>(rhsLD);
     }
-        // rhsVal = static_cast<R>(std::stoll(rhs.toString()));
 
     if ((op == '/' || op == '%') && rhsVal == static_cast<R>(0))
         throw DivisionByZero("Error: Division by zero");
@@ -36,7 +60,7 @@ IOperand const * Operand<T>::makeOp(IOperand const & rhs, char op, eOperandType 
                 result = static_cast<R>(lhsVal % rhsVal);
             break;
         default:
-            throw std::runtime_error("Unknown operator in makeOp");
+            throw UnknownOperation("Unknown operator in makeOp");
     }
 #ifdef DEBUG
     std::cout << "Operation: " << lhsVal << " " << op << " " << rhsVal << " = " << result << std::endl;
@@ -56,17 +80,19 @@ IOperand const * Operand<T>::operate(IOperand const & rhs, char op) const
         case Int32: return makeOp<int32_t>(rhs, op, Int32);
         case Float: return makeOp<float>(rhs, op, Float);
         case Double: return makeOp<double>(rhs, op, Double);
+        case None:
+            throw InvalidOperandType("Invalid operand type in operation.");
     }
-    throw std::runtime_error("Unknown operand type in operation");
+    throw InvalidOperandType("Invalid operand type in operation.");
 }
 
 /* Actual methods */
 
 template <typename T>
-Operand<T>::Operand(T value, eOperandType type) : _value(value), _type(type), _strValue(std::to_string(value))
+Operand<T>::Operand(T value, eOperandType type) : _value(value), _type(type), _strValue(m_toCanonicalString(value, type))
 {
 #ifdef DEBUG
-    std::cout << "Operand created: " << _value << " of type " << typeName(_type) << std::endl;
+    std::cout << "Operand created: " << _value << " of type " << typeName(_type) << " string: " << _strValue << std::endl;
 #endif
 }
 
@@ -76,7 +102,6 @@ Operand<T>::~Operand(void)
 #ifdef DEBUG2
     std::cout << "Operand destroyed: " << _value << " of type " << typeName(_type) << std::endl;
 #endif
-    // delete _strValue;
 }
 
 

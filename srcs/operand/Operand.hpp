@@ -22,6 +22,10 @@ class Operand : public IOperand
         IOperand const * operate(IOperand const & rhs, char op) const;
 
 
+        Operand();
+        Operand(Operand const& other);
+        Operand const& operator=(Operand const& other);
+
     public:
         Operand( T value, eOperandType type );
         virtual ~Operand( void );
