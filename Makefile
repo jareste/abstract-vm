@@ -103,7 +103,7 @@ re: fclean
 		echo ".gitignore already exists."; \
 	fi
 
-.PHONY: all clean fclean re release .gitignore debug dre
+.PHONY: all clean fclean re release .gitignore debug dre test ptest
 
 
 -include $(DEP)
