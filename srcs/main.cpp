@@ -36,7 +36,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    linesRead = iput->readProgram(1);
+    linesRead = iput->readProgram(10000);
     while (linesRead > 0)
     {
         LOG("Read " << linesRead << " lines from input.");
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
         }
 
         LOG("End of lines.");
-        linesRead = iput->readProgram(1);
+        linesRead = iput->readProgram(10000);
     }
 
     std::cerr << "No exit instruction found." << std::endl << "Exiting with error." << std::endl;

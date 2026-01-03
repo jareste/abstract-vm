@@ -37,7 +37,10 @@ size_t inputReader::readProgram(size_t max_lines)
         if (this->_file == &std::cin)
         {
             if (line == ";;")
+            {
+                std::cin.setstate(std::ios::eofbit);
                 break;
+            }
         }
         this->_lines.push_back(Line{this->_lastLineStored, line});
         if ((this->_lastLineStored - initLineNumber) == max_lines)

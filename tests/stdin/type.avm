@@ -1,0 +1,6 @@
+push int32(1)
+push double(2.0)
+add
+assert double(3.0)
+dump
+exit

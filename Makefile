@@ -66,6 +66,10 @@ $(TEST_NAME): $(TEST_OBJ)
 
 test: $(TEST_NAME)
 
+ptest: all
+	chmod +x tests/run_tests.py
+	cd tests && ./run_tests.py
+
 release: CFLAGS = $(RELEASE_CFLAGS)
 release: re
 	@echo "RELEASE BUILD DONE  "

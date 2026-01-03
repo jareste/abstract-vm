@@ -173,4 +173,8 @@ vm::vm()
 
 vm::~vm()
 {
+    for (auto operand : _stack)
+    {
+        delete operand;
+    }
 }
