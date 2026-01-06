@@ -68,6 +68,38 @@ namespace
         return false;
     }
 
+    bool runProgramErrors(inputReader& input, vm& virtualMachine)
+    {
+        std::ofstream devnull("/dev/null");
+        std::streambuf* coutbuf = std::cout.rdbuf(); // save old buffer
+        std::cout.rdbuf(devnull.rdbuf()); // redirect std::cout to devnull
+
+        for (size_t linesRead = input.readProgram(kBatchSize); linesRead > 0; linesRead = input.readProgram(kBatchSize))
+        {
+            try
+            {
+            LOG("Read " << linesRead << " lines from input.");
+
+            for (Line line = input.getLine(); line.no != 0; line = input.getLine())
+            {
+                if (processLine(virtualMachine, line))
+                {
+                    std::cout.rdbuf(coutbuf);
+                    return true;
+                }
+            }
+
+            LOG("End of lines.");
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+            }
+        }
+        std::cout.rdbuf(coutbuf);
+        return false;
+    }
+
     int reportAndFail(const char* prefix, const std::exception& e)
     {
         if (prefix && *prefix)
@@ -81,13 +113,17 @@ namespace
 int main(int argc, char** argv)
 {
     vm virtualMachine;
+    bool sawExit;
     
     LOG("Hello, Abstract VM!");
 
     try
     {
         std::unique_ptr<inputReader> input = makeInput(argc, argv);
-        const bool sawExit = runProgram(*input, virtualMachine);
+        if (argc > 2)
+            sawExit = runProgramErrors(*input, virtualMachine);
+        else
+            sawExit = runProgram(*input, virtualMachine);
 
         if (!sawExit)
         {
