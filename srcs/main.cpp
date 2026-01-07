@@ -71,25 +71,25 @@ namespace
     bool runProgramErrors(inputReader& input, vm& virtualMachine)
     {
         std::ofstream devnull("/dev/null");
-        std::streambuf* coutbuf = std::cout.rdbuf(); // save old buffer
-        std::cout.rdbuf(devnull.rdbuf()); // redirect std::cout to devnull
+        std::streambuf* coutbuf = std::cout.rdbuf();
+        std::cout.rdbuf(devnull.rdbuf());
 
         for (size_t linesRead = input.readProgram(kBatchSize); linesRead > 0; linesRead = input.readProgram(kBatchSize))
         {
             try
             {
-            LOG("Read " << linesRead << " lines from input.");
+                LOG("Read " << linesRead << " lines from input.");
 
-            for (Line line = input.getLine(); line.no != 0; line = input.getLine())
-            {
-                if (processLine(virtualMachine, line))
+                for (Line line = input.getLine(); line.no != 0; line = input.getLine())
                 {
-                    std::cout.rdbuf(coutbuf);
-                    return true;
+                    if (processLine(virtualMachine, line))
+                    {
+                        std::cout.rdbuf(coutbuf);
+                        return true;
+                    }
                 }
-            }
 
-            LOG("End of lines.");
+                LOG("End of lines.");
             }
             catch(const std::exception& e)
             {
@@ -116,6 +116,11 @@ int main(int argc, char** argv)
     bool sawExit;
     
     LOG("Hello, Abstract VM!");
+    if (argc > 3)
+    {
+        std::cerr << "Usage: " << argv[0] << " [input_file] [continue-on-error]\n";
+        return 1;
+    }
 
     try
     {
