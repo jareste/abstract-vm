@@ -111,15 +111,22 @@ void vm::executeInstruction(const Instruction& instr)
             break;
         case OpCode::Assert:
             LOG("Executing Assert instruction.");
-            op1 = dynamic_cast<IOperand const*>(_stack.back());
+            if (!_stack.empty())
             {
-                IOperand const* expected = OperandFactory::createOperand(instr.arg->type, instr.arg->literal);
-                if (op1->getType() != expected->getType() || op1->toString() != expected->toString())
+                op1 = dynamic_cast<IOperand const*>(_stack.back());
                 {
+                    IOperand const* expected = OperandFactory::createOperand(instr.arg->type, instr.arg->literal);
+                    if (op1->getType() != expected->getType() || op1->toString() != expected->toString())
+                    {
+                        delete expected;
+                        throw AssertionFailed(instr.line, "Assertion failed");
+                    }
                     delete expected;
-                    throw AssertionFailed(instr.line, "Assertion failed");
                 }
-                delete expected;
+            }
+            else
+            {
+                throw StackUnderflow(instr.line, "Assert on empty stack");
             }
             break;
         case OpCode::Add:
