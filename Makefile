@@ -4,7 +4,7 @@ TEST_NAME = test_abstract_vm
 #########
 RM = rm -rf
 CC = g++
-CFLAGS = -Werror -Wextra -Wall -std=c++20 -O3 #-fsanitize=address -g  #-DDEBUG
+CFLAGS = -Werror -Wextra -Wall -std=c++20 -O3 -fsanitize=address -g  #-DDEBUG
 # CFLAGS = -Werror -Wextra -Wall -g -fsanitize=address -O3 -I$(OPENSSL_BUILD_DIR)/include -I$(THIRD_PARTY_PATH)/cJSON -Iinc -DUSE_SSL #-DDEBUG
 # CFLAGS = -Werror -Wextra -Wall -g -fsanitize=thread -O3 -I$(OPENSSL_BUILD_DIR)/include -I$(THIRD_PARTY_PATH)/cJSON -Iinc -DUSE_SSL #-DDEBUG
 LDFLAGS = -lm
