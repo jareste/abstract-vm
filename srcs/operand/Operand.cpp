@@ -59,6 +59,9 @@ std::unique_ptr<IOperand const> Operand<T>::makeOp(const IOperand& rhs, char op,
             else
                 result = static_cast<R>(lhsVal % rhsVal);
             break;
+        case '<': result = (lhsVal < rhsVal) ? lhsVal : rhsVal; break;
+        case '>': result = (lhsVal > rhsVal) ? lhsVal : rhsVal; break;
+        case 'r': result = std::pow(lhsVal, 1.0 / rhsVal); break;
         default:
             throw UnknownOperation("Unknown operator in makeOp");
     }
@@ -146,6 +149,31 @@ std::unique_ptr<IOperand const> Operand<T>::operator%(IOperand const& rhs) const
 {
     return operate(rhs, '%');
 }
+
+template <typename T>
+std::unique_ptr<IOperand const> Operand<T>::operator<(IOperand const& rhs) const
+{
+    return operate(rhs, '<');
+}
+
+template <typename T>
+std::unique_ptr<IOperand const> Operand<T>::operator>(IOperand const& rhs) const
+{
+    return operate(rhs, '>');
+}
+
+template <typename T>
+std::unique_ptr<IOperand const> Operand<T>::root(IOperand const& rhs) const
+{
+    return operate(rhs, 'r');
+}
+
+template <typename T>
+std::unique_ptr<IOperand const> Operand<T>::clone( void ) const
+{
+    return std::unique_ptr<IOperand const>(new Operand<T>(this->_value, this->_type));
+}
+
 
 template <typename T>
 std::string const & Operand<T>::toString(void) const

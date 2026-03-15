@@ -210,3 +210,20 @@ class UnknownOperation : public AVMException
 
         virtual ~UnknownOperation() throw (){}
 };
+
+class InvalidInstruction : public AVMException
+{
+    private:
+        std::string _msg;
+    public:
+        InvalidInstruction(int line, const std::string& msg) : AVMException()
+        {
+            _msg = "Invalid instruction at line " + std::to_string(line) + ": " + msg;
+        }
+        virtual const char* what() const throw()
+        {
+            return _msg.c_str();
+        }
+
+        virtual ~InvalidInstruction() throw (){}
+};

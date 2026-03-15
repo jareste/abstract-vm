@@ -1,0 +1,22 @@
+push int32(1)
+push double(2.0)
+push double(3.0)
+push double(5.0)
+push double(6.0)
+push double(7.0)
+dump
+rotate
+dump
+assert int32(1)
+pop
+assert double(7.0)
+pop
+assert double(6.0)
+pop
+assert double(5.0)
+pop
+assert double(3.0)
+pop
+assert double(2.0)
+pop
+exit

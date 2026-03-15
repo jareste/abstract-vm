@@ -45,7 +45,9 @@ Instruction Parser::parseInstruction(const std::vector<Token>& tokens)
         {"push", OpCode::Push}, {"pop", OpCode::Pop}, {"dump", OpCode::Dump},
         {"assert", OpCode::Assert}, {"add", OpCode::Add}, {"sub", OpCode::Sub},
         {"mul", OpCode::Mul}, {"div", OpCode::Div}, {"mod", OpCode::Mod},
-        {"print", OpCode::Print}, {"exit", OpCode::Exit}
+        {"print", OpCode::Print}, {"exit", OpCode::Exit}, {"swap", OpCode::Swap},
+        {"clone", OpCode::Clone}, {"min", OpCode::Min}, {"max", OpCode::Max},
+        {"rotate", OpCode::Rotate}, {"root", OpCode::Root}
     };
 
     static const std::unordered_map<std::string_view, eOperandType> typeMap = {
@@ -94,7 +96,7 @@ Instruction Parser::parseInstruction(const std::vector<Token>& tokens)
                 }
                 else
                 {
-                    throw SyntaxError(token.line, token.col, "Unknown identifier: " + token.lexeme);
+                    throw SyntaxError(token.line, token.col, "Unknown identifier: '" + token.lexeme + "'");
                 }
             }
             break;

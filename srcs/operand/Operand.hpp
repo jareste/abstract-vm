@@ -30,6 +30,7 @@ class Operand : public IOperand
         Operand( T value, eOperandType type );
         virtual ~Operand( void );
 
+        virtual std::unique_ptr<IOperand const> clone( void ) const override;
         virtual int getPrecision( void ) const override;
         virtual eOperandType getType( void ) const override;
         // virtual IOperand const * operator+( IOperand const & rhs ) const override;
@@ -38,5 +39,8 @@ class Operand : public IOperand
         virtual std::unique_ptr<IOperand const> operator*(IOperand const& rhs) const override;
         virtual std::unique_ptr<IOperand const> operator/(IOperand const& rhs) const override;
         virtual std::unique_ptr<IOperand const> operator%(IOperand const& rhs) const override;
+        virtual std::unique_ptr<IOperand const> operator<(IOperand const& rhs) const override;
+        virtual std::unique_ptr<IOperand const> operator>(IOperand const& rhs) const override;
+        virtual std::unique_ptr<IOperand const> root(IOperand const& rhs) const override;
         virtual std::string const & toString( void ) const override;
 };

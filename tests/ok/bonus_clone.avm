@@ -1,0 +1,11 @@
+push int32(1)
+push double(2.0)
+dump
+clone
+dump
+assert double(2.0)
+pop
+assert double(2.0)
+pop
+assert int32(1)
+exit

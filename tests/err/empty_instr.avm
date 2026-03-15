@@ -1,0 +1,29 @@
+add
+mul
+div
+root
+swap
+clone
+pop
+dump
+assert int32(8)
+mod
+print
+rotate
+
+push int8(32)
+dump
+
+add
+mul
+div
+root
+swap
+clone
+pop
+dump
+assert int32(8)
+assert int8(32)
+mod
+print
+rotate

@@ -38,6 +38,11 @@ virtual std::unique_ptr<IOperand const> operator-(IOperand const& rhs) const = 0
 virtual std::unique_ptr<IOperand const> operator*(IOperand const& rhs) const = 0; // Product
 virtual std::unique_ptr<IOperand const> operator/(IOperand const& rhs) const = 0; // Quotient
 virtual std::unique_ptr<IOperand const> operator%(IOperand const& rhs) const = 0; // Modulo
+virtual std::unique_ptr<IOperand const> operator<(IOperand const& rhs) const = 0; // Min
+virtual std::unique_ptr<IOperand const> operator>(IOperand const& rhs) const = 0; // Max
+virtual std::unique_ptr<IOperand const> root(IOperand const& rhs) const = 0;
 virtual std::string const & toString( void ) const = 0; // String representation of the instance
+
+virtual std::unique_ptr<IOperand const> clone( void ) const = 0; // Clone the instance
 virtual ~IOperand( void ) {}
 };
