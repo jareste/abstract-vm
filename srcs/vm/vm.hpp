@@ -17,7 +17,7 @@ struct Instruction {
 class vm
 {
     private:
-        std::vector<IOperand const *> _stack;
+        std::vector<std::unique_ptr<IOperand const>> _stack;
 
         void performOperation(const Instruction& instr);
 

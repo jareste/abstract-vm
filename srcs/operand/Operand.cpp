@@ -31,7 +31,7 @@ static std::string m_toCanonicalString(T v, eOperandType type)
 
 template <typename T>
 template<typename R>
-IOperand const * Operand<T>::makeOp(IOperand const & rhs, char op, eOperandType type) const
+std::unique_ptr<IOperand const> Operand<T>::makeOp(const IOperand& rhs, char op, eOperandType type) const
 {
     R rhsVal;
     if constexpr (std::is_floating_point<R>::value)
@@ -65,11 +65,11 @@ IOperand const * Operand<T>::makeOp(IOperand const & rhs, char op, eOperandType 
 #ifdef DEBUG
     std::cout << "Operation: " << lhsVal << " " << op << " " << rhsVal << " = " << result << std::endl;
 #endif
-    return new Operand<R>(result, type);
+    return std::unique_ptr<IOperand const>(new Operand<R>(result, type));
 }
 
 template <typename T>
-IOperand const * Operand<T>::operate(IOperand const & rhs, char op) const
+std::unique_ptr<IOperand const> Operand<T>::operate(const IOperand& rhs, char op) const
 {
     eOperandType resultType = (this->getPrecision() >= rhs.getPrecision()) ? this->getType() : rhs.getType();
 
@@ -118,31 +118,31 @@ eOperandType Operand<T>::getType(void) const
 }
 
 template <typename T>
-IOperand const * Operand<T>::operator+(IOperand const & rhs) const
+std::unique_ptr<IOperand const> Operand<T>::operator+(IOperand const& rhs) const
 {
     return operate(rhs, '+');
 }
 
 template <typename T>
-IOperand const * Operand<T>::operator-(IOperand const & rhs) const
+std::unique_ptr<IOperand const> Operand<T>::operator-(IOperand const& rhs) const
 {
     return operate(rhs, '-');
 }
 
 template <typename T>
-IOperand const * Operand<T>::operator*(IOperand const & rhs) const
+std::unique_ptr<IOperand const> Operand<T>::operator*(IOperand const& rhs) const
 {
     return operate(rhs, '*');
 }
 
 template <typename T>
-IOperand const * Operand<T>::operator/(IOperand const & rhs) const
+std::unique_ptr<IOperand const> Operand<T>::operator/(IOperand const& rhs) const
 {
     return operate(rhs, '/');
 }
 
 template <typename T>
-IOperand const * Operand<T>::operator%(IOperand const & rhs) const
+std::unique_ptr<IOperand const> Operand<T>::operator%(IOperand const& rhs) const
 {
     return operate(rhs, '%');
 }

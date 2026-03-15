@@ -18,8 +18,8 @@ class Operand : public IOperand
         std::string _strValue;
 
         template<typename R>
-        std::unique_ptr<IOperand const> makeOp(IOperand const & rhs, char op, eOperandType type) const;
-        std::unique_ptr<IOperand const> operate(IOperand const & rhs, char op) const;
+        std::unique_ptr<IOperand const> makeOp(const IOperand& rhs, char op, eOperandType type) const;
+        std::unique_ptr<IOperand const> operate(const IOperand& rhs, char op) const;
 
 
         Operand();
@@ -33,10 +33,10 @@ class Operand : public IOperand
         virtual int getPrecision( void ) const override;
         virtual eOperandType getType( void ) const override;
         // virtual IOperand const * operator+( IOperand const & rhs ) const override;
-        virtual std::unique_ptr<IOperand const> operator+( std::unique_ptr<IOperand const> const & rhs ) const override;
-        virtual std::unique_ptr<IOperand const> operator-( std::unique_ptr<IOperand const> const & rhs ) const override;
-        virtual std::unique_ptr<IOperand const> operator*( std::unique_ptr<IOperand const> const & rhs ) const override;
-        virtual std::unique_ptr<IOperand const> operator/( std::unique_ptr<IOperand const> const & rhs ) const override;
-        virtual std::unique_ptr<IOperand const> operator%( std::unique_ptr<IOperand const> const & rhs ) const override;
+        virtual std::unique_ptr<IOperand const> operator+(IOperand const& rhs) const override;
+        virtual std::unique_ptr<IOperand const> operator-(IOperand const& rhs) const override;
+        virtual std::unique_ptr<IOperand const> operator*(IOperand const& rhs) const override;
+        virtual std::unique_ptr<IOperand const> operator/(IOperand const& rhs) const override;
+        virtual std::unique_ptr<IOperand const> operator%(IOperand const& rhs) const override;
         virtual std::string const & toString( void ) const override;
 };

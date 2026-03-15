@@ -82,10 +82,17 @@ namespace
 
                 for (Line line = input.getLine(); line.no != 0; line = input.getLine())
                 {
-                    if (processLine(virtualMachine, line))
+                    try
                     {
-                        std::cout.rdbuf(coutbuf);
-                        return true;
+                        if (processLine(virtualMachine, line))
+                        {
+                            std::cout.rdbuf(coutbuf);
+                            return true;
+                        }
+                    }
+                    catch (const std::exception& e)
+                    {
+                        std::cerr << "Error on line " << line.no << ": " << e.what() << "\n";
                     }
                 }
 

@@ -36,18 +36,18 @@ void m_print_instruction(const Instruction& instr)
 
 void vm::performOperation(const Instruction& instr)
 {
-    IOperand const* op1;
-    IOperand const* op2;
-    IOperand const* result = nullptr;
+    std::unique_ptr<IOperand const> op1;
+    std::unique_ptr<IOperand const> op2;
+    std::unique_ptr<IOperand const> result = nullptr;
 
     if (_stack.size() < 2)
     {
         throw StackUnderflow(instr.line, "Not enough values on stack for operation");
     }
 
-    op1 = dynamic_cast<IOperand const*>(_stack.back());
+    op1 = std::move(_stack.back());
     _stack.pop_back();
-    op2 = dynamic_cast<IOperand const*>(_stack.back());
+    op2 = std::move(_stack.back());
     _stack.pop_back();
 
     switch (instr.op)
@@ -77,15 +77,14 @@ void vm::performOperation(const Instruction& instr)
             break;
     }
 
-    _stack.push_back(result);
-    delete op1;
-    delete op2;
+    _stack.push_back(std::move(result));
 }
 
 void vm::executeInstruction(const Instruction& instr)
 {
-    IOperand const* op1;
+    std::unique_ptr<IOperand const> op1;
 
+    LOG("Stack size before instruction: " << _stack.size());
     m_print_instruction(instr);
     switch (instr.op)
     {
@@ -97,7 +96,6 @@ void vm::executeInstruction(const Instruction& instr)
             LOG("Executing Pop instruction.");
             if (!_stack.empty())
             {
-                delete _stack.back();
                 _stack.pop_back();
             }
             else
@@ -113,16 +111,16 @@ void vm::executeInstruction(const Instruction& instr)
             LOG("Executing Assert instruction.");
             if (!_stack.empty())
             {
-                op1 = dynamic_cast<IOperand const*>(_stack.back());
+                op1 = std::move(_stack.back());
+                _stack.pop_back();
                 {
-                    IOperand const* expected = OperandFactory::createOperand(instr.arg->type, instr.arg->literal);
+                    std::unique_ptr<IOperand const> expected(OperandFactory::createOperand(instr.arg->type, instr.arg->literal));
                     if (op1->getType() != expected->getType() || op1->toString() != expected->toString())
                     {
-                        delete expected;
                         throw AssertionFailed(instr.line, "Assertion failed");
                     }
-                    delete expected;
                 }
+                _stack.push_back(std::move(op1));
             }
             else
             {
@@ -155,13 +153,15 @@ void vm::executeInstruction(const Instruction& instr)
                 throw StackUnderflow(instr.line, "Print on empty stack");
 
             {
-                IOperand const* top = _stack.back();
+                std::unique_ptr<IOperand const> top = std::move(_stack.back());
+                _stack.pop_back();
                 if (top->getType() != Int8)
                 {
                     throw AssertionFailed(instr.line, "Print instruction requires top of stack to be Int8");
                 }
                 char c = static_cast<char>(std::stoi(top->toString()));
                 std::cout << c << std::endl;
+                _stack.push_back(std::move(top));
             }
             break;
         case OpCode::Exit:
@@ -172,6 +172,8 @@ void vm::executeInstruction(const Instruction& instr)
             LOG("Unknown instruction.");
             break;
     }
+
+    LOG("Stack size after instruction: " << _stack.size());
 }
 
 vm::vm()
@@ -180,8 +182,4 @@ vm::vm()
 
 vm::~vm()
 {
-    for (auto operand : _stack)
-    {
-        delete operand;
-    }
 }
