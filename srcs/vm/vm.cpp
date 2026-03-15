@@ -95,9 +95,7 @@ void vm::executeInstruction(const Instruction& instr)
         case OpCode::Pop:
             LOG("Executing Pop instruction.");
             if (!_stack.empty())
-            {
                 _stack.pop_back();
-            }
             else
                 throw StackUnderflow(instr.line, "Pop on empty stack");
             break;
@@ -113,13 +111,10 @@ void vm::executeInstruction(const Instruction& instr)
             {
                 op1 = std::move(_stack.back());
                 _stack.pop_back();
-                {
-                    std::unique_ptr<IOperand const> expected(OperandFactory::createOperand(instr.arg->type, instr.arg->literal));
-                    if (op1->getType() != expected->getType() || op1->toString() != expected->toString())
-                    {
-                        throw AssertionFailed(instr.line, "Assertion failed");
-                    }
-                }
+                std::unique_ptr<IOperand const> expected(OperandFactory::createOperand(instr.arg->type, instr.arg->literal));
+                if (op1->getType() != expected->getType() || op1->toString() != expected->toString())
+                    throw AssertionFailed(instr.line, "Assertion failed");
+
                 _stack.push_back(std::move(op1));
             }
             else
@@ -156,9 +151,8 @@ void vm::executeInstruction(const Instruction& instr)
                 std::unique_ptr<IOperand const> top = std::move(_stack.back());
                 _stack.pop_back();
                 if (top->getType() != Int8)
-                {
                     throw AssertionFailed(instr.line, "Print instruction requires top of stack to be Int8");
-                }
+
                 char c = static_cast<char>(std::stoi(top->toString()));
                 std::cout << c << std::endl;
                 _stack.push_back(std::move(top));

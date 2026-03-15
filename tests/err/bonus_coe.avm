@@ -30,3 +30,7 @@ push int81(90)
 
 
 push int8(900)
+
+push float(42.42.3)
+
+?

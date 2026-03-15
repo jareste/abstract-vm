@@ -102,9 +102,7 @@ Instruction Parser::parseInstruction(const std::vector<Token>& tokens)
         case TokenKind::Number:
         {
             if (!insideParens)
-            {
                 throw SyntaxError(token.line, token.col, "Unexpected number token outside parentheses: " + token.lexeme);
-            }
 
             if (argType == None)
                 throw SyntaxError(token.line, token.col, "Missing type specifier for value: " + token.lexeme);
