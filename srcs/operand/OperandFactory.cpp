@@ -85,21 +85,43 @@ std::unique_ptr<IOperand const> OperandFactory::createInt32(std::string const& v
 }
 
 std::unique_ptr<IOperand const> OperandFactory::createFloat(std::string const& value) const
-{
-    long double v = parseFloatStrict(value);
-    if (v < -std::numeric_limits<float>::max())
-        throw UnderflowException("Float underflow: " + value);
-    if (v > std::numeric_limits<float>::max())
+{    
+    try
+    {
+        long double v = parseFloatStrict(value);
+
+        /**/
+        if (v < -std::numeric_limits<float>::max())
+            throw UnderflowException("Float underflow: " + value);
+        if (v > std::numeric_limits<float>::max())
+            throw OverflowException("Float overflow: " + value);
+
+        /**/
+        return std::unique_ptr<IOperand const>(new Operand<float>(static_cast<float>(v), Float));
+    }
+    catch(const std::out_of_range& e)
+    {
         throw OverflowException("Float overflow: " + value);
-    return std::unique_ptr<IOperand const>(new Operand<float>(static_cast<float>(v), Float));
+    }
 }
 
 std::unique_ptr<IOperand const> OperandFactory::createDouble(std::string const& value) const
 {
-    long double v = parseFloatStrict(value);
-    if (v < -std::numeric_limits<double>::max())
-        throw UnderflowException("Double underflow: " + value);
-    if (v > std::numeric_limits<double>::max())
+    try
+    {
+        long double v = parseFloatStrict(value);
+
+        /**/
+        if (v < -std::numeric_limits<double>::max())
+            throw UnderflowException("Double underflow: " + value);
+        if (v > std::numeric_limits<double>::max())
+            throw OverflowException("Double overflow: " + value);
+
+        /**/
+        return std::unique_ptr<IOperand const>(new Operand<double>(static_cast<double>(v), Double));
+    }
+    catch(const std::out_of_range& e)
+    {
         throw OverflowException("Double overflow: " + value);
-    return std::unique_ptr<IOperand const>(new Operand<double>(static_cast<double>(v), Double));
+    }
 }

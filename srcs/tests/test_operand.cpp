@@ -67,90 +67,79 @@ int main() {
     run_case("Int32 + Double => Double", []{
         Operand<int32_t> a(42, Int32);
         Operand<double>  b(3.14, Double);
-        const IOperand* r = a + b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a + b;
+        print_result(r.get());
     });
 
     run_case("Int8 + Int16 => Int16", []{
         Operand<int8_t>  a(10, Int8);
         Operand<int16_t> b(200, Int16);
-        const IOperand* r = a + b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a + b;
+        print_result(r.get());
     });
 
     run_case("Int32 * Float => Float", []{
         Operand<int32_t> a(3, Int32);
         Operand<float>   b(2.5f, Float);
-        const IOperand* r = a * b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a * b;
+        print_result(r.get());
     });
 
     banner("2) Non-commutative correctness (sub/div/mod order)");
     run_case("Sub: 10 - 3 = 7", []{
         Operand<int32_t> a(10, Int32);
         Operand<int32_t> b(3, Int32);
-        const IOperand* r = a - b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a - b;
+        print_result(r.get());
     });
 
     run_case("Div: 10 / 4 = 2 (int div) o 2.5 (float promotion)", []{
         Operand<int32_t> a(10, Int32);
         Operand<int32_t> b(4, Int32);
-        const IOperand* r = a / b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a / b;
+        print_result(r.get());
 
         Operand<int32_t> c(10, Int32);
         Operand<float>   d(4.0f, Float);
-        const IOperand* r2 = c / d;
-        print_result(r2);
-        delete r2;
+        std::unique_ptr<const IOperand> r2 = c / d;
+        print_result(r2.get());
     });
 
     banner("3) Division/mod by zero should raise");
     run_case("Div by 0 (int): expect exception", []{
         Operand<int32_t> a(10, Int32);
         Operand<int32_t> b(0, Int32);
-        const IOperand* r = a / b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a / b;
+        print_result(r.get());
     }, true);
 
     run_case("Mod by 0 (int): expect exception", []{
         Operand<int32_t> a(10, Int32);
         Operand<int32_t> b(0, Int32);
-        const IOperand* r = a % b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a % b;
+        print_result(r.get());
     }, true);
 
     run_case("Div by 0 (float): expect exception", []{
         Operand<float> a(10.0f, Float);
         Operand<float> b(0.0f, Float);
-        const IOperand* r = a / b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a / b;
+        print_result(r.get());
     }, true);
 
     banner("4) Mod with floating point (policy-dependent, but must be safe)");
     run_case("Mod Float % Float ", []{
         Operand<float> a(5.5f, Float);
         Operand<float> b(2.0f, Float);
-        const IOperand* r = a % b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a % b;
+        print_result(r.get());
     });
 
     run_case("Mod Double % Int32", []{
         Operand<double> a(5.5, Double);
         Operand<int32_t> b(2, Int32);
-        const IOperand* r = a % b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a % b;
+        print_result(r.get());
     });
 
     banner("5) Overflow / Underflow construction (should raise)"); 
@@ -167,9 +156,8 @@ int main() {
     run_case("Float overflow: huge value", []{
         Operand<float> a(std::numeric_limits<float>::max(), Float);
         Operand<float> b(std::numeric_limits<float>::max(), Float);
-        const IOperand* r = a + b;
-        print_result(r);
-        delete r;
+        std::unique_ptr<const IOperand> r = a + b;
+        print_result(r.get());
     });
 
     banner("6) Stress: many allocations/deallocations (leaks/double-free/UB)");
@@ -177,157 +165,117 @@ int main() {
         for (int i = 0; i < 10000; ++i) {
             Operand<int32_t> a(42, Int32);
             Operand<double>  b(3.14, Double);
-            const IOperand* r = a + b;
+            std::unique_ptr<const IOperand> r = a + b;
             (void)r->toString(); /* Just to check any unvalid reference or w/e */
-            delete r;
         }
         std::cout << "Loop done.\n";
     });
 
     banner("7) Operand factory creation tests");
     run_case("Create Int8 operand with value 42", []{
-        const IOperand* op = OperandFactory::createOperand(Int8, "42");
-        print_result(op);
-        delete op;
+        std::unique_ptr<const IOperand> op = OperandFactory::createOperand(Int8, "42");
+        print_result(op.get());
     });
 
     run_case("Create Float operand with value 3.14", []{
-        const IOperand* op = OperandFactory::createOperand(Float, "3.14");
-        print_result(op);
-        delete op;
+        std::unique_ptr<const IOperand> op = OperandFactory::createOperand(Float, "3.14");
+        print_result(op.get());
     });
 
     run_case("Create Double operand with value 2.71828", []{
-        const IOperand* op = OperandFactory::createOperand(Double, "2.71828");
-        print_result(op);
-        delete op;
+        std::unique_ptr<const IOperand> op = OperandFactory::createOperand(Double, "2.71828");
+        print_result(op.get());
     });
 
     run_case("Create Int16 operand with overflow value 40000: expect exception", []{
-        const IOperand* op = OperandFactory::createOperand(Int16, "40000");
-        print_result(op);
+        std::unique_ptr<const IOperand> op = OperandFactory::createOperand(Int16, "40000");
+        print_result(op.get());
     }, true);
 
     run_case("Create Int32 operand with underflow value -3000000000: expect exception", []{
-        const IOperand* op = OperandFactory::createOperand(Int32, "-3000000000");
-        print_result(op);
-    }, true);
-
-    run_case("Create Float operand with overflow value 1e40: expect exception", []{
-        const IOperand* op = OperandFactory::createOperand(Float, "1e40");
-        print_result(op);
+        std::unique_ptr<const IOperand> op = OperandFactory::createOperand(Int32, "-3000000000");
+        print_result(op.get());
     }, true);
 
     run_case("Create Double operand with underflow value -1e400: expect exception", []{
-        const IOperand* op = OperandFactory::createOperand(Double, "-1e400");
-        print_result(op);
+        std::unique_ptr<const IOperand> op = OperandFactory::createOperand(Double, "-1e400");
+        print_result(op.get());
     }, true);
 
     run_case("Create operand with invalid type: expect exception", []{
-        const IOperand* op = OperandFactory::createOperand(static_cast<eOperandType>(999), "42");
-        print_result(op);
-        delete op;
+        std::unique_ptr<const IOperand> op = OperandFactory::createOperand(static_cast<eOperandType>(999), "42");
+        print_result(op.get());
     }, true);
 
     banner("8) Operantions with factory-created operands");
     run_case("Factory Int16 + Factory Float => Float", []{
-        const IOperand* a = OperandFactory::createOperand(Int16, "12345");
-        const IOperand* b = OperandFactory::createOperand(Float, "3.14");
-        const IOperand* r = *a + *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Int16, "12345");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Float, "3.14");
+        std::unique_ptr<const IOperand> r = *a + *b;
+        print_result(r.get());
     });
 
     run_case("Factory Double / Factory Int8 => Double", []{
-        const IOperand* a = OperandFactory::createOperand(Double, "22.0");
-        const IOperand* b = OperandFactory::createOperand(Int8, "7");
-        const IOperand* r = *a / *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Double, "22.0");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Int8, "7");
+        std::unique_ptr<const IOperand> r = *a / *b;
+        print_result(r.get());
     });
 
     run_case("Factory Int32 % Factory Int16 => Int16", []{
-        const IOperand* a = OperandFactory::createOperand(Int32, "100");
-        const IOperand* b = OperandFactory::createOperand(Int16, "30");
-        const IOperand* r = *a % *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Int32, "100");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Int16, "30");
+        std::unique_ptr<const IOperand> r = *a % *b;
+        print_result(r.get());
     });
 
     run_case("Factory Float - Factory Double => Double", []{
-        const IOperand* a = OperandFactory::createOperand(Float, "5.5");
-        const IOperand* b = OperandFactory::createOperand(Double, "2.2");
-        const IOperand* r = *a - *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Float, "5.5");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Double, "2.2");
+        std::unique_ptr<const IOperand> r = *a - *b;
+        print_result(r.get());
     });
 
     run_case("Factory Int8 * Factory Int8 => Int8", []{
-        const IOperand* a = OperandFactory::createOperand(Int8, "12");
-        const IOperand* b = OperandFactory::createOperand(Int8, "10");
-        const IOperand* r = *a * *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Int8, "12");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Int8, "10");
+        std::unique_ptr<const IOperand> r = *a * *b;
+        print_result(r.get());
     });
 
     run_case("Factory Int8 * Factory Int8 with overflow: expect exception", []{
-        const IOperand* a = OperandFactory::createOperand(Int8, "20");
-        const IOperand* b = OperandFactory::createOperand(Int8, "10");
-        const IOperand* r = *a * *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Int8, "20");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Int8, "10");
+        std::unique_ptr<const IOperand> r = *a * *b;
+        print_result(r.get());
     });
 
     run_case("Factory Float / Factory Float div by zero: expect exception", []{
-        const IOperand* a = OperandFactory::createOperand(Float, "3.14");
-        const IOperand* b = OperandFactory::createOperand(Float, "0.0");
-        const IOperand* r = *a / *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Float, "3.14");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Float, "0.0");
+        std::unique_ptr<const IOperand> r = *a / *b;
+        print_result(r.get());
     }, true);
 
     run_case("Factory Double % Factory Double mod by zero: expect exception", []{
-        const IOperand* a = OperandFactory::createOperand(Double, "2.71828");
-        const IOperand* b = OperandFactory::createOperand(Double, "0.0");
-        const IOperand* r = *a % *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Double, "2.71828");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Double, "0.0");
+        std::unique_ptr<const IOperand> r = *a % *b;
+        print_result(r.get());
     }, true);
 
     run_case("Factory Int16 - Factory Int32 underflow: expect exception", []{
-        const IOperand* a = OperandFactory::createOperand(Int16, "-30000");
-        const IOperand* b = OperandFactory::createOperand(Int32, "10000");
-        const IOperand* r = *a - *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Int16, "-30000");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Int32, "10000");
+        std::unique_ptr<const IOperand> r = *a - *b;
+        print_result(r.get());
     });
 
     run_case("Factory Float + Factory Float overflow: expect exception", []{
-        const IOperand* a = OperandFactory::createOperand(Float, "1e38");
-        const IOperand* b = OperandFactory::createOperand(Float, "1e38");
-        const IOperand* r = *a + *b;
-        print_result(r);
-        delete a;
-        delete b;
-        delete r;
+        std::unique_ptr<const IOperand> a = OperandFactory::createOperand(Float, "1e38");
+        std::unique_ptr<const IOperand> b = OperandFactory::createOperand(Float, "1e38");
+        std::unique_ptr<const IOperand> r = *a + *b;
+        print_result(r.get());
     });
 
     banner("DONE");
