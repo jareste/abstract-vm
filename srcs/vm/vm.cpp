@@ -62,10 +62,10 @@ void vm::performOperation(const Instruction& instr)
         throw StackUnderflow(instr.line, "Not enough values on stack for operation " + std::string(OpCodeNames.at(instr.op)));
     }
 
-    op1 = std::move(_stack.back());
-    _stack.pop_back();
-    op2 = std::move(_stack.back());
-    _stack.pop_back();
+    op1 = std::move(_stack.top());
+    _stack.pop();
+    op2 = std::move(_stack.top());
+    _stack.pop();
 
     switch (instr.op)
     {
@@ -106,7 +106,7 @@ void vm::performOperation(const Instruction& instr)
             break;
     }
 
-    _stack.push_back(std::move(result));
+    _stack.push(std::move(result));
 }
 
 void vm::m_executeExit(const Instruction& instr)
@@ -119,25 +119,38 @@ void vm::m_executeExit(const Instruction& instr)
 void vm::m_executePush(const Instruction& instr)
 {
     LOG("Executing Push instruction with argument: " << instr.arg->literal);
-    _stack.push_back(OperandFactory::createOperand(instr.arg->type, instr.arg->literal));
+    _stack.push(OperandFactory::createOperand(instr.arg->type, instr.arg->literal));
 }
 
 void vm::m_executePop(const Instruction& instr)
 {
     LOG("Executing Pop instruction.");
     if (!_stack.empty())
-        _stack.pop_back();
+        _stack.pop();
     else
         throw StackUnderflow(instr.line, "Pop on empty stack");
 }
 
 void vm::m_executeDump(const Instruction& instr)
 {
+    std::vector<std::unique_ptr<IOperand const>> tmp;
+ 
     (void)instr; /* KCH */
     LOG("Executing Dump instruction.");
-    for (auto it = _stack.rbegin(); it != _stack.rend(); ++it)
+
+    tmp.reserve(_stack.size());
+
+    while (!_stack.empty())
+    {
+        tmp.push_back(std::move(_stack.top()));
+        _stack.pop();
+    }
+
+    for (auto it = tmp.begin(); it != tmp.end(); ++it)
         std::cout << (*it)->toString() << std::endl;
 
+    for (auto it = tmp.rbegin(); it != tmp.rend(); ++it)
+        _stack.push(std::move(*it));
 }
 
 void vm::m_executeAssert(const Instruction& instr)
@@ -147,13 +160,13 @@ void vm::m_executeAssert(const Instruction& instr)
     LOG("Executing Assert instruction.");
     if (!_stack.empty())
     {
-        op1 = std::move(_stack.back());
-        _stack.pop_back();
+        op1 = std::move(_stack.top());
+        _stack.pop();
         std::unique_ptr<IOperand const> expected(OperandFactory::createOperand(instr.arg->type, instr.arg->literal));
         if (op1->getType() != expected->getType() || op1->toString() != expected->toString())
             throw AssertionFailed(instr.line, "Assertion failed");
 
-        _stack.push_back(std::move(op1));
+        _stack.push(std::move(op1));
     }
     else
     {
@@ -168,14 +181,14 @@ void vm::m_executePrint(const Instruction& instr)
         throw StackUnderflow(instr.line, "Print on empty stack");
 
     {
-        std::unique_ptr<IOperand const> top = std::move(_stack.back());
-        _stack.pop_back();
+        std::unique_ptr<IOperand const> top = std::move(_stack.top());
+        _stack.pop();
         if (top->getType() != Int8)
             throw AssertionFailed(instr.line, "Print instruction requires top of stack to be Int8");
 
         char c = static_cast<char>(std::stoi(top->toString()));
         std::cout << c << std::endl;
-        _stack.push_back(std::move(top));
+        _stack.push(std::move(top));
     }
 }
 
@@ -186,13 +199,13 @@ void vm::m_executeSwap(const Instruction& instr)
         throw StackUnderflow(instr.line, "Not enough values on stack to swap");
 
     {
-        std::unique_ptr<IOperand const> top1 = std::move(_stack.back());
-        _stack.pop_back();
-        std::unique_ptr<IOperand const> top2 = std::move(_stack.back());
-        _stack.pop_back();
+        std::unique_ptr<IOperand const> top1 = std::move(_stack.top());
+        _stack.pop();
+        std::unique_ptr<IOperand const> top2 = std::move(_stack.top());
+        _stack.pop();
 
-        _stack.push_back(std::move(top1));
-        _stack.push_back(std::move(top2));
+        _stack.push(std::move(top1));
+        _stack.push(std::move(top2));
     }
 }
 
@@ -202,10 +215,10 @@ void vm::m_executeClone(const Instruction& instr)
     if (_stack.empty())
         throw StackUnderflow(instr.line, "Clone on empty stack");
     {
-        std::unique_ptr<IOperand const> top = std::move(_stack.back());
-        _stack.pop_back();
-        _stack.push_back(top->clone());
-        _stack.push_back(std::move(top));
+        std::unique_ptr<IOperand const> top = std::move(_stack.top());
+        _stack.pop();
+        _stack.push(top->clone());
+        _stack.push(std::move(top));
     }
 }
 
@@ -215,13 +228,20 @@ void vm::m_executeRotate(const Instruction& instr)
     if (_stack.empty())
         throw StackUnderflow(instr.line, "Rotate on empty stack");
     {
-        auto stack_copy = std::move(_stack);
-        _stack.clear();
+        std::vector<std::unique_ptr<IOperand const>> stack_copy;
+        stack_copy.reserve(_stack.size());
+
+        while (!_stack.empty())
+        {
+            stack_copy.push_back(std::move(_stack.top()));
+            _stack.pop();
+        }
+    
+        std::reverse(stack_copy.begin(), stack_copy.end());
+
         auto stack_size = stack_copy.size();
         for (size_t i = 0; i < stack_size; ++i)
-        {
-            _stack.push_back(std::move(stack_copy[(i + 1) % stack_size]));
-        }
+            _stack.push(std::move(stack_copy[(i + 1) % stack_size]));
     }
 }
 

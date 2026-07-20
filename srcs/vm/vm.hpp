@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <stack>
 #include <string>
 #include <optional>
 #include "../operand/IOperand.hpp"
@@ -17,7 +17,7 @@ struct Instruction {
 class vm
 {
     private:
-        std::vector<std::unique_ptr<IOperand const>> _stack;
+        std::stack<std::unique_ptr<IOperand const>> _stack;
 
         void performOperation(const Instruction& instr);
 

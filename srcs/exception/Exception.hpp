@@ -17,15 +17,14 @@ class AVMException : public std::exception
         virtual ~AVMException() throw (){}
 };
 
-class DivisionByZero : public AVMException
+class DivisionByZero : public AVMException, public std::runtime_error
 {
     private:
         std::string _msg;
     public:
-        DivisionByZero(const std::string& msg) : AVMException(), _msg(msg) {}
-        DivisionByZero(int lineNumber): AVMException()
+        DivisionByZero(const std::string& msg) : AVMException(), std::runtime_error(msg), _msg(msg) {}
+        DivisionByZero(int lineNumber): AVMException(), std::runtime_error("Division by zero at line " + std::to_string(lineNumber)), _msg("Division by zero at line " + std::to_string(lineNumber))
         {
-            _msg = "Division by zero at line " + std::to_string(lineNumber);
         }
         virtual const char* what() const throw()
         {
@@ -35,12 +34,12 @@ class DivisionByZero : public AVMException
         virtual ~DivisionByZero() throw (){}
 }; 
 
-class OverflowException : public AVMException
+class OverflowException : public AVMException, public std::overflow_error
 {
     private:
         std::string _msg;
     public:
-        OverflowException(const std::string& msg) : AVMException(), _msg(msg) {}
+        OverflowException(const std::string& msg) : AVMException(), std::overflow_error(msg), _msg(msg) {}
         virtual const char* what() const throw()
         {
             return _msg.c_str();
@@ -49,12 +48,12 @@ class OverflowException : public AVMException
         virtual ~OverflowException() throw (){}
 };
 
-class UnderflowException : public AVMException
+class UnderflowException : public AVMException, public std::underflow_error
 {
     private:
         std::string _msg;
     public:
-        UnderflowException(const std::string& msg) : AVMException(), _msg(msg) {}
+        UnderflowException(const std::string& msg) : AVMException(), std::underflow_error(msg), _msg(msg) {}
         virtual const char* what() const throw()
         {
             return _msg.c_str();
@@ -63,12 +62,12 @@ class UnderflowException : public AVMException
         virtual ~UnderflowException() throw (){}
 };
 
-class InvalidValue : public AVMException
+class InvalidValue : public AVMException, public std::invalid_argument
 {
     private:
         std::string _msg;
     public:
-        InvalidValue(const std::string& msg) : AVMException(), _msg(msg) {}
+        InvalidValue(const std::string& msg) : AVMException(), std::invalid_argument(msg), _msg(msg) {}
         virtual const char* what() const throw()
         {
             return _msg.c_str();
@@ -76,7 +75,6 @@ class InvalidValue : public AVMException
 
         virtual ~InvalidValue() throw (){}
 };
-
 
 class LexicalError : public AVMException
 {
@@ -117,13 +115,13 @@ class SyntaxError : public AVMException
         virtual ~SyntaxError() throw (){}
 };
 
-class StackUnderflow : public AVMException
+class StackUnderflow : public AVMException, public std::underflow_error
 {
     private:
         std::string _msg;
     public:
-        StackUnderflow(const std::string& msg) : AVMException(), _msg(msg) {}
-        StackUnderflow(int line, const std::string& msg) : AVMException(), _msg("Stack underflow at line " + std::to_string(line) + ": " + msg) {}
+        StackUnderflow(const std::string& msg) : AVMException(), std::underflow_error(msg), _msg(msg) {}
+        StackUnderflow(int line, const std::string& msg) : AVMException(), std::underflow_error("Stack underflow at line " + std::to_string(line) + ": " + msg), _msg("Stack underflow at line " + std::to_string(line) + ": " + msg) {}
         virtual const char* what() const throw()
         {
             return _msg.c_str();
