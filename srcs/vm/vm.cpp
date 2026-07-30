@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <unordered_map>
+#include <vector>
 #include "../exception/Exception.hpp"
 #include "../debug_log.hpp"
 
