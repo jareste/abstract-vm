@@ -18,6 +18,7 @@ class vm
 {
     private:
         std::stack<std::unique_ptr<IOperand const>> _stack;
+        bool _silent = false;
 
         void performOperation(const Instruction& instr);
 
@@ -36,8 +37,11 @@ class vm
 
     public:
         vm();
+        vm(bool silent);
         ~vm();
         void executeInstruction(const Instruction& instr);
+        bool isSilent() const { return _silent; }
+        void setSilent(bool silent) { _silent = silent; }
 
 };
 

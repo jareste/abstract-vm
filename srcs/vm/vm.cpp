@@ -136,6 +136,9 @@ void vm::m_executeDump(const Instruction& instr)
 {
     std::vector<std::unique_ptr<IOperand const>> tmp;
  
+    if (_silent)
+        return;
+
     (void)instr; /* KCH */
     LOG("Executing Dump instruction.");
 
@@ -180,6 +183,9 @@ void vm::m_executePrint(const Instruction& instr)
     LOG("Executing Print instruction.");
     if (_stack.empty())
         throw StackUnderflow(instr.line, "Print on empty stack");
+
+    if (_silent)
+        return;
 
     {
         std::unique_ptr<IOperand const> top = std::move(_stack.top());
@@ -286,6 +292,10 @@ void vm::executeInstruction(const Instruction& instr)
 }
 
 vm::vm()
+{
+}
+
+vm::vm(bool silent) : _silent(silent)
 {
 }
 
